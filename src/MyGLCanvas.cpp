@@ -17,7 +17,7 @@ MyGLCanvas::MyGLCanvas(MyFrame *parent, const wxGLAttributes &canvasAttrs) :
     // Explicitly create a new rendering context instance for this canvas.
     wxGLContextAttrs ctxAttrs;
     ctxAttrs.CoreProfile().OGLVersion(3, 3).Robust().ResetIsolation().EndList();
-    m_oglContext = new wxGLContext(this, NULL, &ctxAttrs);
+    m_oglContext = new wxGLContext(this, nullptr, &ctxAttrs);
 
     if (!m_oglContext->IsOK()) {
         wxMessageBox("This sample needs an OpenGL 3.3 capable driver.\nThe app will end now.",
@@ -30,7 +30,11 @@ MyGLCanvas::MyGLCanvas(MyFrame *parent, const wxGLAttributes &canvasAttrs) :
 #endif // wxUSE_LOGWINDOW
     }
 
-    Bind(wxEVT_MOUSEWHEEL, [&red, this](wxMouseEvent& event){ float diff = static_cast<float>(event.GetWheelRotation()) / 1200.0f; red += diff; Refresh();});
+    Bind(wxEVT_MOUSEWHEEL, [&red, this](wxMouseEvent& event){
+        float diff = static_cast<float>(event.GetWheelRotation()) / 1200.0f;
+        red += diff;
+        Refresh();
+    });
 }
 
 MyGLCanvas::~MyGLCanvas() {
