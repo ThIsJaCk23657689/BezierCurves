@@ -7,52 +7,48 @@ wxBEGIN_EVENT_TABLE(MyGLCanvas, wxGLCanvas)
     EVT_MOUSE_EVENTS(MyGLCanvas::OnMouse)
 wxEND_EVENT_TABLE()
 
-static float red = 1.0f;
-
 MyGLCanvas::MyGLCanvas(MyFrame *parent, const wxGLAttributes &canvasAttrs) :
     wxGLCanvas(parent, canvasAttrs) {
     m_parent = parent;
-    m_winHeight = 0;
+    m_window_height = 0;
 
     // Explicitly create a new rendering context instance for this canvas.
     wxGLContextAttrs ctxAttrs;
     ctxAttrs.CoreProfile().OGLVersion(3, 3).Robust().ResetIsolation().EndList();
-    m_oglContext = new wxGLContext(this, nullptr, &ctxAttrs);
+    m_opengl_context = new wxGLContext(this, nullptr, &ctxAttrs);
 
-    if (!m_oglContext->IsOK()) {
+    if (!m_opengl_context->IsOK()) {
         wxMessageBox("This sample needs an OpenGL 3.3 capable driver.\nThe app will end now.",
             "OpenGL version error", wxOK | wxICON_INFORMATION, this);
-        delete m_oglContext;
-        m_oglContext = nullptr;
+        delete m_opengl_context;
+        m_opengl_context = nullptr;
     } else {
 #if wxUSE_LOGWINDOW
         wxLogMessage("OpenGL Core Profile 3.2 successfully set.");
 #endif // wxUSE_LOGWINDOW
     }
 
-    Bind(wxEVT_MOUSEWHEEL, [&red, this](wxMouseEvent& event){
+    Bind(wxEVT_MOUSEWHEEL, [this](wxMouseEvent& event) {
         float diff = static_cast<float>(event.GetWheelRotation()) / 1200.0f;
-        red += diff;
-        Refresh();
     });
 }
 
 MyGLCanvas::~MyGLCanvas() {
-    if (m_oglContext)
-        SetCurrent(*m_oglContext);
+    if (m_opengl_context)
+        SetCurrent(*m_opengl_context);
 
-    if (m_oglContext) {
-        delete m_oglContext;
-        m_oglContext = nullptr;
+    if (m_opengl_context) {
+        delete m_opengl_context;
+        m_opengl_context = nullptr;
     }
 }
 
-bool MyGLCanvas::oglInit() {
-    if (!m_oglContext)
+bool MyGLCanvas::Init() {
+    if (!m_opengl_context)
         return false;
 
     // The current context must be set before we get OGL pointers
-    SetCurrent(*m_oglContext);
+    SetCurrent(*m_opengl_context);
 
     // Initialize our OGL pointers
     gladLoadGL();
@@ -61,11 +57,11 @@ bool MyGLCanvas::oglInit() {
 void MyGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event)) {
     wxPaintDC dc(this);
 
-    if (m_winHeight < 1 )
+    if (m_window_height < 1 )
         return;
 
-    SetCurrent(*m_oglContext);
-    glClearColor(red, 0.0f, 0.0f, 1.0f);
+    SetCurrent(*m_opengl_context);
+    glClearColor(0.2f, 0.2f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     SwapBuffers();
@@ -78,10 +74,10 @@ void MyGLCanvas::OnSize(wxSizeEvent& event) {
     if (!IsShownOnScreen())
         return;
 
-    SetCurrent(*m_oglContext);
+    SetCurrent(*m_opengl_context);
 
     const wxSize size = event.GetSize() * GetContentScaleFactor();
-    m_winHeight = size.y;
+    m_window_height = size.y;
 
     // Generate paint event without erasing the background
     Refresh(false);
@@ -90,7 +86,7 @@ void MyGLCanvas::OnSize(wxSizeEvent& event) {
 void MyGLCanvas::OnMouse(wxMouseEvent &event) {
     event.Skip();
 
-    int oglwinY = m_winHeight - event.GetY();
+    int oglwinY = m_window_height - event.GetY();
 
     if (event.LeftIsDown()) {
         if (!event.Dragging()) {
@@ -99,8 +95,10 @@ void MyGLCanvas::OnMouse(wxMouseEvent &event) {
         } else {
             // Rotation
 
-            // Generate paint event without erasing the background
-            Refresh(false);
         }
     }
+}
+
+void MyGLCanvas::OnUpdate(wxTimerEvent& event) {
+    Refresh();
 }

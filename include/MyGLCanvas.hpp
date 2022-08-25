@@ -13,22 +13,25 @@
 #include <wx/glcanvas.h>
 #include "MyFrame.hpp"
 
+class MyFrame;
+
 class MyGLCanvas : public wxGLCanvas {
 public:
     MyGLCanvas(MyFrame* parent, const wxGLAttributes& canvasAttrs);
     ~MyGLCanvas();
 
-    // Init the OpenGL stuff
-    bool oglInit();
+    // Init the OpenGL
+    bool Init();
 
     void OnPaint(wxPaintEvent& event);
     void OnSize(wxSizeEvent& event);
     void OnMouse(wxMouseEvent& event);
+    void OnUpdate(wxTimerEvent& event);
 
 private:
     MyFrame* m_parent;
-    wxGLContext* m_oglContext;
-    int m_winHeight;
+    wxGLContext* m_opengl_context;
+    int m_window_height;
 
     wxDECLARE_EVENT_TABLE();
 };
