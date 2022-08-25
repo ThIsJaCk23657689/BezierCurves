@@ -30,7 +30,7 @@ public:
 
 private:
     MyFrame* m_parent;
-    wxGLContext* m_opengl_context;
+    wxGLContext* m_context;
     int m_window_height;
 
     wxDECLARE_EVENT_TABLE();

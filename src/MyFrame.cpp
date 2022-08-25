@@ -26,7 +26,6 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size) 
     wxLog::SetActiveTarget(m_LogWin);
 #endif // wxUSE_LOGWINDOW
 
-    SetMinSize(wxSize(250, 200));
 
     // Setting OpenGL Display mode (RGBA, Depth 16 bits, Double Buffer, 1 Sample Buffer, 4 Sampler)
     wxGLAttributes vAttrs;
@@ -38,11 +37,23 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size) 
         Close();
     }
 
+    // Sizer
+    auto* mainSizer = new wxBoxSizer(wxHORIZONTAL);
+    auto* controlSizer = new wxBoxSizer(wxVERTICAL);
+    auto* rightPanel = new wxPanel(this, wxID_ANY);
+
     // Create OpenGL Canvas
     m_canvas = new MyGLCanvas(this, vAttrs);
 
     // Create Timer
     m_timer = new MyTimer(m_canvas);
+
+    controlSizer->Add(rightPanel, wxSizerFlags().Proportion(1).Expand());
+    mainSizer->Add(m_canvas, wxSizerFlags().Proportion(8).Expand());
+    mainSizer->Add(controlSizer, wxSizerFlags().Proportion(2).Expand());
+    SetSizer(mainSizer);
+    SetMinSize(wxSize(1000, 600));
+    mainSizer->Fit(this);
 }
 
 void MyFrame::OpenGLInit() {
